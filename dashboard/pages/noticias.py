@@ -1,11 +1,15 @@
 import html
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import feedparser
 import streamlit as st
+
+# Fuso horário de Brasília (UTC-3). Garante datas/horas no padrão do usuário BR.
+TZ_BRASIL = ZoneInfo("America/Sao_Paulo")
 
 
 def limpar_html(texto: str) -> str:
@@ -18,6 +22,44 @@ def limpar_html(texto: str) -> str:
     decodificado = html.unescape(sem_tags)
     # Normaliza espaços/quebras
     return re.sub(r"\s+", " ", decodificado).strip()
+
+
+def formatar_data_relativa(dt_utc: datetime) -> str:
+    """
+    Converte uma datetime UTC em string amigável no horário de Brasília.
+    Exemplos: 'há 12 min', 'há 3 h', 'hoje 14:30', 'ontem 22:15', '07/05 09:00'.
+    """
+    if dt_utc is None:
+        return "Data desconhecida"
+
+    dt_br = dt_utc.astimezone(TZ_BRASIL)
+    agora_br = datetime.now(TZ_BRASIL)
+    delta = agora_br - dt_br
+
+    # Datas no futuro (problema comum em RSS mal formatado): mostra como "agora"
+    if delta.total_seconds() < 0:
+        return "agora há pouco"
+
+    minutos = int(delta.total_seconds() // 60)
+    if minutos < 1:
+        return "agora há pouco"
+    if minutos < 60:
+        return f"há {minutos} min"
+
+    horas = minutos // 60
+    if horas < 24:
+        return f"há {horas} h"
+
+    # Dia de hoje (Brasília)
+    hoje = agora_br.date()
+    ontem = hoje - timedelta(days=1)
+    if dt_br.date() == hoje:
+        return f"hoje {dt_br.strftime('%H:%M')}"
+    if dt_br.date() == ontem:
+        return f"ontem {dt_br.strftime('%H:%M')}"
+
+    # Mais antigo: data e hora completas em pt-BR
+    return dt_br.strftime("%d/%m/%Y %H:%M")
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
@@ -77,13 +119,22 @@ def buscar_noticias_cache(feeds_tuple: tuple) -> list[dict]:
                 link = getattr(entry, "link", "") or ""
                 summary = limpar_html(getattr(entry, "summary", "") or "")
 
-                # Parsear data
+                # Parsear data (sempre tratada como UTC — padrão do feedparser)
                 published = None
-                if hasattr(entry, "published_parsed") and entry.published_parsed:
-                    try:
-                        published = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
-                    except Exception:
-                        pass
+                for attr in ("published_parsed", "updated_parsed", "created_parsed"):
+                    val = getattr(entry, attr, None)
+                    if val:
+                        try:
+                            published = datetime(*val[:6], tzinfo=timezone.utc)
+                            break
+                        except Exception:
+                            continue
+
+                # Descarta datas no futuro (feeds com timezone errado/bug)
+                if published is not None:
+                    agora_utc = datetime.now(timezone.utc)
+                    if published > agora_utc + timedelta(hours=2):
+                        published = None  # data inválida, melhor não exibir
 
                 if titulo and link:
                     noticias.append({
@@ -162,9 +213,9 @@ noticias_filtradas = []
 agora = datetime.now(timezone.utc)
 
 for n in todas_noticias:
-    # Filtro de tempo
+    # Filtro de tempo (delta negativo = futuro: tratamos como "0 horas atrás")
     if n["data"] is not None:
-        delta_h = (agora - n["data"]).total_seconds() / 3600
+        delta_h = max(0, (agora - n["data"]).total_seconds() / 3600)
         if delta_h > horas_max:
             continue
 
@@ -208,7 +259,7 @@ COR_BORDA = {"positivo": "#2ca02c", "negativo": "#d62728", "neutro": "#7f7f7f"}
 
 for n in noticias_filtradas[:50]:
     icone = ICONE_SENTIMENTO.get(n["sentimento"], "⚪")
-    data_str = n["data"].strftime("%d/%m/%Y %H:%M") if n["data"] else "Data desconhecida"
+    data_str = formatar_data_relativa(n["data"])
 
     titulo_seguro = limpar_html(n["titulo"])
     resumo_seguro = limpar_html(n["resumo"])
