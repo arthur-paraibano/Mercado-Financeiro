@@ -9,3 +9,15 @@ venv/
 dist/
 build/
 .streamlit/
+
+# Dados pessoais do usuário (perfil, watchlist, diário, quiz)
+dashboard/data/
+
+# Cache local
+http_cache.sqlite
+*.sqlite
+
+# Ferramentas locais
+.claude/
+.spec-kit/
+
