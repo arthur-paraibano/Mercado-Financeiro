@@ -14,6 +14,7 @@ from src.collectors.b3_collector import SETORES_B3  # noqa: E402
 from src.processors.recommendation_engine import RecommendationEngine  # noqa: E402
 from dashboard.components.ticker_selector import ticker_multiselect  # noqa: E402
 from dashboard.components.glossario import avaliar_iniciante, tip  # noqa: E402
+from dashboard.components.descoberta import descobertas_do_dia, joias_escondidas  # noqa: E402
 
 st.title("Recomendações de Compra")
 
@@ -40,7 +41,28 @@ modo_iniciante = st.sidebar.toggle(
 
 # --- Seleção ---
 st.sidebar.header("Configuração")
-modo = st.sidebar.radio("Modo:", ["Lista curada (top ações)", "Por setor", "Personalizado"])
+modo = st.sidebar.radio(
+    "Modo:",
+    [
+        "Lista curada (top ações)",
+        "🎲 Descobertas do Dia",
+        "⭐ Joias Escondidas",
+        "Por setor",
+        "Personalizado",
+    ],
+    help=(
+        "**Descobertas do Dia:** sorteia 25 ações de um universo de ~85 papéis líquidos. "
+        "A lista muda a cada dia, mas é a mesma para todos os usuários (reprodutível).\n\n"
+        "**Joias Escondidas:** sorteia 25 ações fora dos blue chips mais óbvios — "
+        "para descobrir mid/small caps com bons fundamentos."
+    ),
+)
+
+# Estado: offset da seed (permite forçar nova amostra sem mudar o dia)
+if "desc_offset" not in st.session_state:
+    st.session_state["desc_offset"] = 0
+if "joia_offset" not in st.session_state:
+    st.session_state["joia_offset"] = 0
 
 if modo == "Lista curada (top ações)":
     tickers = [
@@ -50,6 +72,23 @@ if modo == "Lista curada (top ações)":
         "BBDC4", "PRIO3", "VIVT3", "ABEV3", "BBSE3",
         "ITSA4", "EQTL3", "SANB11", "ENGI11", "RENT3",
     ]
+elif modo == "🎲 Descobertas do Dia":
+    qtd_desc = st.sidebar.slider("Quantidade:", 10, 40, 25, key="qtd_desc")
+    tickers = descobertas_do_dia(qtd_desc, offset=st.session_state["desc_offset"])
+    if st.sidebar.button("🔄 Trocar seleção", key="btn_troca_desc"):
+        st.session_state["desc_offset"] += 1
+        # Limpa resultados antigos pois mudou a amostra
+        st.session_state.pop("rec_recs_raw", None)
+        st.rerun()
+    st.sidebar.caption(f"Lista do dia ({len(tickers)} ações). Os scores são deterministicos — só a amostra muda.")
+elif modo == "⭐ Joias Escondidas":
+    qtd_joia = st.sidebar.slider("Quantidade:", 10, 30, 20, key="qtd_joia")
+    tickers = joias_escondidas(qtd_joia, offset=st.session_state["joia_offset"])
+    if st.sidebar.button("🔄 Trocar seleção", key="btn_troca_joia"):
+        st.session_state["joia_offset"] += 1
+        st.session_state.pop("rec_recs_raw", None)
+        st.rerun()
+    st.sidebar.caption(f"Mid/small caps fora dos blue chips ({len(tickers)} ações).")
 elif modo == "Por setor":
     setor = st.sidebar.selectbox("Setor:", list(SETORES_B3.keys()))
     tickers = SETORES_B3[setor]
