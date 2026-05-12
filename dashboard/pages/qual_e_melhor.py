@@ -86,8 +86,8 @@ if st.button("Comparar", type="primary"):
                 except Exception:
                     dados_fund = {}
                 dados_por_ticker[t] = {**dados_fund, **{
-                    "preço": dados_brapi.get("regularMarketPrice", 0),
-                    "variação": dados_brapi.get("regularMarketChangePercent", 0),
+                    "preco": dados_brapi.get("regularMarketPrice", 0),
+                    "variacao": dados_brapi.get("regularMarketChangePercent", 0),
                     "empresa": dados_brapi.get("shortName", t),
                 }}
                 try:
@@ -108,8 +108,8 @@ if st.button("Comparar", type="primary"):
         cols_header[i].caption(d.get("empresa", t)[:35])
         cols_header[i].metric(
             "Cotação",
-            f"R$ {d['preço']:.2f}",
-            f"{d['variação']:+.2f}%",
+            f"R$ {d['preco']:.2f}",
+            f"{d['variacao']:+.2f}%",
         )
 
     st.divider()

@@ -285,12 +285,12 @@ if rec_sel:
 
     # Preços
     col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Cotação Atual", f"R$ {rec_sel.cotação:.2f}")
+    col1.metric("Cotação Atual", f"R$ {rec_sel.cotacao:.2f}")
     col2.metric("Preço Justo", f"R$ {rec_sel.preco_justo:.2f}", help=tip("PRECO_JUSTO"))
     col3.metric(
         "Preço Teto (c/ margem)",
         f"R$ {rec_sel.preco_teto:.2f}",
-        f"{'Abaixo do teto' if rec_sel.cotação <= rec_sel.preco_teto else 'Acima do teto'}",
+        f"{'Abaixo do teto' if rec_sel.cotacao <= rec_sel.preco_teto else 'Acima do teto'}",
         help=tip("PRECO_TETO"),
     )
     col4.metric("Upside", f"{rec_sel.upside_pct:+.1f}%", help=tip("UPSIDE"))

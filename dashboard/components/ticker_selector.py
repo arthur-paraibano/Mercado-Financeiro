@@ -92,7 +92,7 @@ def ticker_multiselect(
     if default:
         for t in default:
             if t in acoes:
-                default_opts.append(f"{t} - {ações[t]}")
+                default_opts.append(f"{t} - {acoes[t]}")
 
     selecionados = widget(label, options, default=default_opts, key=key)
     return [s.split(" - ")[0].strip() for s in selecionados]

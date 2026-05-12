@@ -42,7 +42,7 @@ if st.button("Analisar", type="primary") or ticker:
             market_cap = dados_fund.get("market_cap") or dados_brapi.get("marketCap", 0)
 
             col1, col2, col3, col4 = st.columns(4)
-            col1.metric("Preço", f"R$ {preço:.2f}", f"{variação:.2f}%")
+            col1.metric("Preço", f"R$ {preco:.2f}", f"{variacao:.2f}%")
             col2.metric(
                 "Market Cap",
                 f"R$ {market_cap / 1e9:.1f}B" if market_cap else "N/A",

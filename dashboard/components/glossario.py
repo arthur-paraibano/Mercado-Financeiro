@@ -157,7 +157,7 @@ def avaliar_iniciante(indicadores: dict, scores: dict) -> tuple[bool, list[str]]
         motivos.append(f"✅ Lucra de verdade (margem {margem:.1f}%)")
         pontos += 1
     if saude >= CRITERIOS_INICIANTE["score_saude_minimo"]:
-        motivos.append(f"✅ Saúde financeira boa (score {saúde:.0f})")
+        motivos.append(f"✅ Saúde financeira boa (score {saude:.0f})")
         pontos += 1
     if pl > 0 and roe > 0:
         motivos.append("✅ Empresa lucrativa hoje (não tem prejuizo)")

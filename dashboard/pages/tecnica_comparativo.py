@@ -118,8 +118,8 @@ if st.button("Comparar", type="primary"):
             st.markdown(f"**{ticker}**")
             st.metric("Retorno", f"{retorno:+.2f}%")
             st.metric("Volatilidade (anualiz.)", f"{volatilidade:.1f}%")
-            st.metric("Máxima", f"R$ {máxima:.2f}")
-            st.metric("Mínima", f"R$ {mínima:.2f}")
+            st.metric("Máxima", f"R$ {maxima:.2f}")
+            st.metric("Mínima", f"R$ {minima:.2f}")
 
     st.divider()
 

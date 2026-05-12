@@ -147,14 +147,14 @@ if st.button("Analisar", type="primary") or ticker:
     st.subheader("Dados do Último Pregao")
     ultima = df.iloc[-1]
     col1, col2, col3, col4, col5, col6 = st.columns(6)
-    col1.metric("Fechamento", f"R$ {última['close']:.2f}")
-    col2.metric("Abertura", f"R$ {última['open']:.2f}")
-    col3.metric("Máxima", f"R$ {última['high']:.2f}")
-    col4.metric("Mínima", f"R$ {última['low']:.2f}")
-    col5.metric("Volume", f"{última['volume']:,.0f}")
+    col1.metric("Fechamento", f"R$ {ultima['close']:.2f}")
+    col2.metric("Abertura", f"R$ {ultima['open']:.2f}")
+    col3.metric("Máxima", f"R$ {ultima['high']:.2f}")
+    col4.metric("Mínima", f"R$ {ultima['low']:.2f}")
+    col5.metric("Volume", f"{ultima['volume']:,.0f}")
 
     if pd.notna(ultima.get("atr_14")):
-        col6.metric("ATR (14)", f"{última['atr_14']:.2f}")
+        col6.metric("ATR (14)", f"{ultima['atr_14']:.2f}")
 
     # Suporte e Resistencia
     st.divider()
