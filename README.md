@@ -1,5 +1,9 @@
 # 📈 Mercado Financeiro BR
 
+> **🌐 App online:** https://mercado-financeiro-pb.streamlit.app
+>
+> **👨‍💻 Desenvolvedor:** Arthur Paraibano · [GitHub @arthur-paraibano](https://github.com/arthur-paraibano)
+
 Dashboard completo de análise da bolsa brasileira (B3) com indicadores fundamentalistas, análise técnica, recomendações automáticas e ferramentas educacionais para investidores iniciantes.
 
 ## ✨ Recursos
@@ -107,3 +111,12 @@ Este projeto é **educacional**. NÃO constitui recomendação profissional de i
 ## 📜 Licença
 
 Uso pessoal e educacional.
+
+## 👨‍💻 Autor
+
+**Arthur Paraibano**
+
+- 🐙 GitHub: [@arthur-paraibano](https://github.com/arthur-paraibano)
+- 📦 Repositório: [Mercado-Financeiro](https://github.com/arthur-paraibano/Mercado-Financeiro)
+
+Sinta-se à vontade para abrir _issues_, _pull requests_ ou sugestões!
