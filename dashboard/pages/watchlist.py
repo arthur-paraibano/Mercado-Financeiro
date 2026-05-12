@@ -1,4 +1,3 @@
-import json
 import sys
 from pathlib import Path
 
@@ -11,22 +10,15 @@ sys.path.insert(0, str(ROOT))
 from src.collectors.brapi_collector import BrapiCollector  # noqa: E402
 from src.collectors.b3_collector import SETORES_B3, get_setor_do_ticker  # noqa: E402
 from dashboard.components.ticker_selector import ticker_selectbox, TICKERS_DISPONIVEIS  # noqa: E402
-
-WATCHLIST_FILE = Path(__file__).parent.parent / "data" / "watchlist.json"
+from dashboard.components.storage import carregar, salvar  # noqa: E402
 
 
 def carregar_watchlist() -> dict:
-    if WATCHLIST_FILE.exists():
-        try:
-            return json.loads(WATCHLIST_FILE.read_text(encoding="utf-8"))
-        except Exception:
-            pass
-    return {"tickers": [], "alertas": {}}
+    return carregar("watchlist", {"tickers": [], "alertas": {}})
 
 
 def salvar_watchlist(data: dict):
-    WATCHLIST_FILE.parent.mkdir(parents=True, exist_ok=True)
-    WATCHLIST_FILE.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    salvar("watchlist", data)
 
 
 st.title("⭐ Watchlist — Meus Favoritos")

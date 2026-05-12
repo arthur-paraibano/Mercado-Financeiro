@@ -1,4 +1,3 @@
-import json
 import random
 import sys
 from datetime import date, datetime
@@ -11,35 +10,15 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
 
 from src.collectors.brapi_collector import BrapiCollector  # noqa: E402
-
-WATCHLIST_FILE = Path(__file__).parent.parent / "data" / "watchlist.json"
-DIARIO_FILE = Path(__file__).parent.parent / "data" / "diario.json"
-QUIZ_FILE = Path(__file__).parent.parent / "data" / "quiz_progresso.json"
+from dashboard.components.storage import carregar, salvar  # noqa: E402
 
 st.title("📓 Diário do Investidor")
 st.caption("Acompanhe sua carteira, anote decisões e aprenda um pouco a cada dia.")
 
 
-# ========================================
-# Persistencia
-# ========================================
-def carregar(path: Path, default):
-    if path.exists():
-        try:
-            return json.loads(path.read_text(encoding="utf-8"))
-        except Exception:
-            pass
-    return default
-
-
-def salvar(path: Path, data):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
-
-
-wl = carregar(WATCHLIST_FILE, {"tickers": [], "alertas": {}})
-diario = carregar(DIARIO_FILE, {"entradas": []})
-quiz_prog = carregar(QUIZ_FILE, {"acertos": 0, "total": 0, "ultima_data": None, "perguntas_feitas": []})
+wl = carregar("watchlist", {"tickers": [], "alertas": {}})
+diario = carregar("diario", {"entradas": []})
+quiz_prog = carregar("quiz_progresso", {"acertos": 0, "total": 0, "ultima_data": None, "perguntas_feitas": []})
 
 
 # ========================================
@@ -167,7 +146,7 @@ with tab2:
                     "ticker": ticker_opt.upper().strip() if ticker_opt else None,
                     "texto": texto.strip(),
                 })
-                salvar(DIARIO_FILE, diario)
+                salvar("diario", diario)
                 st.success("Anotacao salva!")
                 st.rerun()
             else:
@@ -200,7 +179,7 @@ with tab2:
                 with col2:
                     if st.button("🗑️", key=f"del_{i}", help="Excluir anotacao"):
                         diario["entradas"].remove(entrada)
-                        salvar(DIARIO_FILE, diario)
+                        salvar("diario", diario)
                         st.rerun()
 
 
@@ -339,7 +318,7 @@ with tab3:
         st.info("✅ **Você já respondeu o quiz de hoje.** Volte amanha para uma nova pergunta!")
         if st.button("🔄 Quero responder outra mesmo assim"):
             quiz_prog["ultima_data"] = None
-            salvar(QUIZ_FILE, quiz_prog)
+            salvar("quiz_progresso", quiz_prog)
             st.rerun()
     else:
         # Selecionar pergunta nao feita recentemente
@@ -374,6 +353,6 @@ with tab3:
 
             quiz_prog["ultima_data"] = hoje_iso
             quiz_prog.setdefault("perguntas_feitas", []).append(idx_pergunta)
-            salvar(QUIZ_FILE, quiz_prog)
+            salvar("quiz_progresso", quiz_prog)
 
 st.caption("Seus dados ficam salvos localmente em `dashboard/data/`")

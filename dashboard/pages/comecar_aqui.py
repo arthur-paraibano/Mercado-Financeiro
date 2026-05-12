@@ -1,4 +1,3 @@
-import json
 import sys
 from pathlib import Path
 
@@ -8,25 +7,18 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
 
 from dashboard.components.formatos import fmt_brl, fmt_num, fmt_pct  # noqa: E402
-
-PERFIL_FILE = Path(__file__).parent.parent / "data" / "perfil.json"
+from dashboard.components.storage import carregar, salvar  # noqa: E402
 
 st.title("🎓 Começar Aqui — Guia do Investidor Iniciante")
 st.caption("Antes de comprar sua primeira ação, vamos garantir que você está no caminho certo.")
 
 
 def carregar_perfil() -> dict:
-    if PERFIL_FILE.exists():
-        try:
-            return json.loads(PERFIL_FILE.read_text(encoding="utf-8"))
-        except Exception:
-            pass
-    return {}
+    return carregar("perfil", {})
 
 
 def salvar_perfil(data: dict):
-    PERFIL_FILE.parent.mkdir(parents=True, exist_ok=True)
-    PERFIL_FILE.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    salvar("perfil", data)
 
 
 perfil = carregar_perfil()
