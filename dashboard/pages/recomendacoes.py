@@ -32,89 +32,116 @@ ICONES_SINAL = {
     "EVITAR": "🔴",
 }
 
-# Toggle modo iniciante
-modo_iniciante = st.sidebar.toggle(
-    "👶 Modo Iniciante",
-    value=False,
-    help="Filtra apenas ações amigáveis para quem está começando: dividendos consistentes, empresa rentável, preço justo.",
-)
-
-# --- Seleção ---
-st.sidebar.header("Configuração")
-modo = st.sidebar.radio(
-    "Modo:",
-    [
-        "Lista curada (top ações)",
-        "🎲 Descobertas do Dia",
-        "⭐ Joias Escondidas",
-        "Por setor",
-        "Personalizado",
-    ],
-    help=(
-        "**Descobertas do Dia:** sorteia 25 ações de um universo de ~85 papéis líquidos. "
-        "A lista muda a cada dia, mas é a mesma para todos os usuários (reprodutível).\n\n"
-        "**Joias Escondidas:** sorteia 25 ações fora dos blue chips mais óbvios — "
-        "para descobrir mid/small caps com bons fundamentos."
-    ),
-)
-
 # Estado: offset da seed (permite forçar nova amostra sem mudar o dia)
 if "desc_offset" not in st.session_state:
     st.session_state["desc_offset"] = 0
 if "joia_offset" not in st.session_state:
     st.session_state["joia_offset"] = 0
 
-if modo == "Lista curada (top ações)":
-    tickers = [
-        "WEGE3", "ITUB4", "BBAS3", "VALE3", "PETR4",
-        "EGIE3", "TAEE11", "CPFE3", "SUZB3", "KLBN11",
-        "RDOR3", "FLRY3", "TOTS3", "SLCE3", "JBSS3",
-        "BBDC4", "PRIO3", "VIVT3", "ABEV3", "BBSE3",
-        "ITSA4", "EQTL3", "SANB11", "ENGI11", "RENT3",
-    ]
-elif modo == "🎲 Descobertas do Dia":
-    qtd_desc = st.sidebar.slider("Quantidade:", 10, 40, 25, key="qtd_desc")
-    tickers = descobertas_do_dia(qtd_desc, offset=st.session_state["desc_offset"])
-    if st.sidebar.button("🔄 Trocar seleção", key="btn_troca_desc"):
-        st.session_state["desc_offset"] += 1
-        # Limpa resultados antigos pois mudou a amostra
-        st.session_state.pop("rec_recs_raw", None)
-        st.rerun()
-    st.sidebar.caption(f"Lista do dia ({len(tickers)} ações). Os scores são deterministicos — só a amostra muda.")
-elif modo == "⭐ Joias Escondidas":
-    qtd_joia = st.sidebar.slider("Quantidade:", 10, 30, 20, key="qtd_joia")
-    tickers = joias_escondidas(qtd_joia, offset=st.session_state["joia_offset"])
-    if st.sidebar.button("🔄 Trocar seleção", key="btn_troca_joia"):
-        st.session_state["joia_offset"] += 1
-        st.session_state.pop("rec_recs_raw", None)
-        st.rerun()
-    st.sidebar.caption(f"Mid/small caps fora dos blue chips ({len(tickers)} ações).")
-elif modo == "Por setor":
-    setor = st.sidebar.selectbox("Setor:", list(SETORES_B3.keys()))
-    tickers = SETORES_B3[setor]
-else:
-    tickers = ticker_multiselect(
-        "Selecione ações:",
-        default=["WEGE3", "ITUB4", "VALE3", "PETR4", "BBAS3", "EGIE3", "TAEE11"],
-        key="rec_custom",
-        sidebar=True,
-    )
+# ========================================
+# Configurações da página (corpo)
+# ========================================
+with st.expander("⚙️ Configurações", expanded=True):
+    col_a, col_b = st.columns([3, 2])
 
-# Filtros
-st.sidebar.header("Filtros")
-sinais_filtro = st.sidebar.multiselect(
-    "Mostrar apenas:",
-    ["COMPRA FORTE", "COMPRA", "NEUTRO", "CAUTELA", "EVITAR"],
-    default=["COMPRA FORTE", "COMPRA", "NEUTRO"],
-)
+    with col_a:
+        st.markdown("**Universo de análise**")
+        modo = st.radio(
+            "Modo:",
+            [
+                "Lista curada (top ações)",
+                "🎲 Descobertas do Dia",
+                "⭐ Joias Escondidas",
+                "Por setor",
+                "Personalizado",
+            ],
+            horizontal=False,
+            help=(
+                "**Descobertas do Dia:** sorteia ações de um universo de ~140 papéis líquidos. "
+                "A lista muda a cada dia, mas é a mesma para todos os usuários (reprodutível).\n\n"
+                "**Joias Escondidas:** sorteia ações fora dos blue chips mais óbvios — "
+                "para descobrir mid/small caps com bons fundamentos."
+            ),
+        )
 
-upside_min = st.sidebar.slider("Upside mínimo (%)", -50, 100, -10, 5)
+    with col_b:
+        st.markdown("**Modo de exibição**")
+        modo_iniciante = st.toggle(
+            "👶 Modo Iniciante",
+            value=False,
+            help="Filtra apenas ações amigáveis para iniciantes: dividendos consistentes, empresa rentável, preço justo.",
+        )
+
+        st.markdown("**Filtros**")
+        sinais_filtro = st.multiselect(
+            "Mostrar apenas sinais:",
+            ["COMPRA FORTE", "COMPRA", "NEUTRO", "CAUTELA", "EVITAR"],
+            default=["COMPRA FORTE", "COMPRA", "NEUTRO"],
+        )
+        upside_min = st.slider("Upside mínimo (%)", -50, 100, -10, 5)
+
+    # Configurações específicas por modo
+    if modo == "Lista curada (top ações)":
+        tickers = [
+            "WEGE3", "ITUB4", "BBAS3", "VALE3", "PETR4",
+            "EGIE3", "TAEE11", "CPFE3", "SUZB3", "KLBN11",
+            "RDOR3", "FLRY3", "TOTS3", "SLCE3", "JBSS3",
+            "BBDC4", "PRIO3", "VIVT3", "ABEV3", "BBSE3",
+            "ITSA4", "EQTL3", "SANB11", "ENGI11", "RENT3",
+        ]
+        st.caption(f"📋 Analisando {len(tickers)} ações da lista curada.")
+    elif modo == "🎲 Descobertas do Dia":
+        col_q, col_b = st.columns([3, 1])
+        with col_q:
+            qtd_desc = st.slider("Quantidade:", 10, 40, 25, key="qtd_desc")
+        with col_b:
+            st.write("")
+            st.write("")
+            if st.button("🔄 Trocar seleção", key="btn_troca_desc", use_container_width=True):
+                st.session_state["desc_offset"] += 1
+                st.session_state.pop("rec_recs_raw", None)
+                st.rerun()
+        tickers = descobertas_do_dia(qtd_desc, offset=st.session_state["desc_offset"])
+        st.caption(f"🎲 Lista do dia ({len(tickers)} ações). Os scores são determinísticos — só a amostra muda.")
+    elif modo == "⭐ Joias Escondidas":
+        col_q, col_b = st.columns([3, 1])
+        with col_q:
+            qtd_joia = st.slider("Quantidade:", 10, 30, 20, key="qtd_joia")
+        with col_b:
+            st.write("")
+            st.write("")
+            if st.button("🔄 Trocar seleção", key="btn_troca_joia", use_container_width=True):
+                st.session_state["joia_offset"] += 1
+                st.session_state.pop("rec_recs_raw", None)
+                st.rerun()
+        tickers = joias_escondidas(qtd_joia, offset=st.session_state["joia_offset"])
+        st.caption(f"⭐ Mid/small caps fora dos blue chips ({len(tickers)} ações).")
+    elif modo == "Por setor":
+        setor = st.selectbox("Setor:", list(SETORES_B3.keys()))
+        tickers = SETORES_B3[setor]
+        st.caption(f"🏭 {len(tickers)} ações do setor {setor}.")
+    else:
+        tickers = ticker_multiselect(
+            "Selecione ações:",
+            default=["WEGE3", "ITUB4", "VALE3", "PETR4", "BBAS3", "EGIE3", "TAEE11"],
+            key="rec_custom",
+            sidebar=False,
+        )
 
 
 # ========================================
 # Geração / Cache em session_state
 # ========================================
-if st.button("Gerar Recomendações", type="primary"):
+col_gerar, col_limpar = st.columns([3, 1])
+with col_gerar:
+    gerar = st.button("Gerar Recomendações", type="primary", use_container_width=True)
+with col_limpar:
+    if "rec_recs_raw" in st.session_state:
+        if st.button("🗑️ Limpar", use_container_width=True):
+            del st.session_state["rec_recs_raw"]
+            st.rerun()
+
+if gerar:
     engine = RecommendationEngine()
     recs_raw = []
 
@@ -134,19 +161,13 @@ if st.button("Gerar Recomendações", type="primary"):
     st.session_state["rec_recs_raw"] = recs_raw
     st.session_state["rec_data"] = date.today().strftime("%d/%m/%Y")
 
-# Limpar resultados manualmente (botão opcional)
-if "rec_recs_raw" in st.session_state:
-    if st.sidebar.button("🗑️ Limpar resultados"):
-        del st.session_state["rec_recs_raw"]
-        st.rerun()
-
 # ========================================
 # Renderização (a partir de session_state)
 # ========================================
 recs_raw = st.session_state.get("rec_recs_raw")
 
 if not recs_raw:
-    st.info("👈 Configure as opções na barra lateral e clique em **Gerar Recomendações** para começar.")
+    st.info("☝️ Configure as opções acima e clique em **Gerar Recomendações** para começar.")
     st.stop()
 
 # Aplicar filtros (reagem dinamicamente sem precisar gerar de novo)
