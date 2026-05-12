@@ -1,22 +1,25 @@
-# Coleta de dados
+# --- Coleta de dados ---
 requests
 beautifulsoup4
+html5lib
+feedparser
+yfinance
 
-# Processamento
+# --- Processamento ---
 pandas
 numpy
 
-# Banco de dados
-sqlalchemy
-psycopg2-binary
-
-# Dashboard
+# --- Dashboard ---
 streamlit
 plotly
 
-# Utilitarios
+# --- Utilitários ---
 python-dotenv
 loguru
 
-# Testes
+# --- Testes (opcional em produção) ---
 pytest
+
+# --- Banco de dados (opcional, apenas para uso local com scripts/setup.py) ---
+# sqlalchemy
+# psycopg2-binary
