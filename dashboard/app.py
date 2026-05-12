@@ -31,6 +31,8 @@ tecnica_analise = st.Page("pages/tecnica_analise.py", title="Análise Técnica",
 tecnica_sinais = st.Page("pages/tecnica_sinais.py", title="Scanner de Sinais", icon="📡")
 tecnica_comparativo = st.Page("pages/tecnica_comparativo.py", title="Comparativo", icon="🔀")
 
+sobre = st.Page("pages/sobre.py", title="Sobre", icon="ℹ️")
+
 pg = st.navigation({
     "Início": [comecar_aqui, diario],
     "Fundamentalista": [
@@ -41,6 +43,17 @@ pg = st.navigation({
     "Análise Técnica": [
         tecnica_analise, tecnica_sinais, tecnica_comparativo,
     ],
+    "Outros": [sobre],
 })
 
 pg.run()
+
+# --- Rodapé global na sidebar (aparece em todas as páginas) ---
+with st.sidebar:
+    st.markdown("---")
+    st.caption(
+        "👨‍💻 Desenvolvido por **Arthur Paraibano**  \n"
+        "[GitHub](https://github.com/arthur-paraibano) · "
+        "[Repositório](https://github.com/arthur-paraibano/Mercado-Financeiro)"
+    )
+    st.caption("⚠️ Conteúdo educacional. Não constitui recomendação de investimento.")
