@@ -1,0 +1,26 @@
+Sistema de Eventos
+
+
+C:\Users\Arthur\Desktop\Projetos\Pessoal\Sistema de Eventos\modulos\gestaoevento
+mvn spring-boot:run
+
+
+C:\Users\Arthur\Desktop\Projetos\Pessoal\Sistema de Eventos\modulos\gestao-de-eventos-react
+npm start
+
+
+C:\Users\Arthur\Desktop\Projetos\Pessoal\Sistema de Eventos\modulos
+
+cd gestaoevento/target
+
+# Limpar banco Railway
+javac CleanRailway.java
+java -cp ".;lib/mysql-connector-j-8.3.0.jar" CleanRailway
+
+# Depois se registrar no site e rodar:
+java -cp ".;lib/mysql-connector-j-8.3.0.jar" SetAdmin
+
+# Limpar banco local (se precisar)
+javac CleanDb.java
+java -cp ".;lib/mysql-connector-j-8.3.0.jar" CleanDb
+

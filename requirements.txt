@@ -1,0 +1,22 @@
+# Coleta de dados
+requests
+beautifulsoup4
+
+# Processamento
+pandas
+numpy
+
+# Banco de dados
+sqlalchemy
+psycopg2-binary
+
+# Dashboard
+streamlit
+plotly
+
+# Utilitarios
+python-dotenv
+loguru
+
+# Testes
+pytest
