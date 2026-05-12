@@ -1,10 +1,15 @@
 import streamlit as st
 
+from dashboard.components.i18n import aplicar_traducoes_streamlit
+
 st.set_page_config(
     page_title="Mercado Financeiro BR",
     page_icon="📈",
     layout="wide",
 )
+
+# Traduz strings nativas do Streamlit ("View X more", "View less", etc.)
+aplicar_traducoes_streamlit()
 
 # --- Navegação com seções ---
 comecar_aqui = st.Page("pages/comecar_aqui.py", title="Começar Aqui", icon="🎓", default=True)
