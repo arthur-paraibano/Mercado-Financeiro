@@ -1,9 +1,23 @@
+import html
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 import feedparser
 import streamlit as st
+
+
+def limpar_html(texto: str) -> str:
+    """Remove tags HTML e decodifica entidades. Evita erros de React no Streamlit."""
+    if not texto:
+        return ""
+    # Remove tags HTML
+    sem_tags = re.sub(r"<[^>]+>", "", texto)
+    # Decodifica entidades HTML (&amp; -> &, &nbsp; -> espaço, etc.)
+    decodificado = html.unescape(sem_tags)
+    # Normaliza espaços/quebras
+    return re.sub(r"\s+", " ", decodificado).strip()
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
@@ -59,9 +73,9 @@ def buscar_noticias_cache(feeds_tuple: tuple) -> list[dict]:
         try:
             feed = feedparser.parse(url)
             for entry in feed.entries[:25]:
-                titulo = getattr(entry, "title", "") or ""
+                titulo = limpar_html(getattr(entry, "title", "") or "")
                 link = getattr(entry, "link", "") or ""
-                summary = getattr(entry, "summary", "") or ""
+                summary = limpar_html(getattr(entry, "summary", "") or "")
 
                 # Parsear data
                 published = None
@@ -181,20 +195,17 @@ COR_BORDA = {"positivo": "#2ca02c", "negativo": "#d62728", "neutro": "#7f7f7f"}
 for n in noticias_filtradas[:50]:
     icone = ICONE_SENTIMENTO.get(n["sentimento"], "⚪")
     data_str = n["data"].strftime("%d/%m/%Y %H:%M") if n["data"] else "Data desconhecida"
-    cor = COR_BORDA.get(n["sentimento"], "#7f7f7f")
 
-    st.markdown(
-        f"""
-<div style="border-left: 4px solid {cor}; padding: 8px 12px; margin-bottom: 8px; background: #1a1a1a; border-radius: 4px;">
-  <div style="font-size: 0.85em; color: #888;">{icone} {n['fonte']} &nbsp;|&nbsp; {data_str}</div>
-  <div style="font-size: 1em; font-weight: bold; margin: 4px 0;">
-    <a href="{n['link']}" target="_blank" style="color: #4da6ff; text-decoration: none;">{n['titulo']}</a>
-  </div>
-  <div style="font-size: 0.85em; color: #aaa;">{n['resumo'][:200]}{'...' if len(n['resumo']) > 200 else ''}</div>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
+    titulo_seguro = limpar_html(n["titulo"])
+    resumo_seguro = limpar_html(n["resumo"])
+    if len(resumo_seguro) > 220:
+        resumo_seguro = resumo_seguro[:220] + "..."
+
+    with st.container(border=True):
+        st.caption(f"{icone} **{n['fonte']}**  ·  {data_str}")
+        st.markdown(f"**[{titulo_seguro}]({n['link']})**")
+        if resumo_seguro:
+            st.caption(resumo_seguro)
 
 if len(noticias_filtradas) > 50:
     st.info(f"Mostrando 50 de {len(noticias_filtradas)} notícias. Refine os filtros para ver resultados mais especificos.")
