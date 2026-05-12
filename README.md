@@ -63,8 +63,9 @@ python -m venv .venv
 # Instalar dependências
 pip install -r requirements.txt
 
-# Criar .env com o token brapi
-echo "BRAPI_TOKEN=seu_token_aqui" > .env
+# Copiar arquivo de exemplo e preencher seu token brapi
+cp .env.example .env
+# (edite o .env e cole seu BRAPI_TOKEN)
 
 # Rodar
 streamlit run dashboard/app.py

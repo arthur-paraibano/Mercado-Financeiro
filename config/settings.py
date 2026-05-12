@@ -41,7 +41,8 @@ CVM_ITR_URL = f"{CVM_BASE_URL}/DOC/ITR/DADOS"
 CVM_CAD_URL = f"{CVM_BASE_URL}/CAD/DADOS"
 
 # --- Banco de dados (apenas para uso local via scripts/setup.py) ---
-DATABASE_URL = _get_secret("DATABASE_URL", "postgresql://postgres:admin@localhost:5432/mercado_financeiro")
+# Defina DATABASE_URL no .env ou secrets.toml. Ex: postgresql://usuario:senha@host:5432/banco
+DATABASE_URL = _get_secret("DATABASE_URL", "")
 
 # --- Rate limits (segundos entre requisições) ---
 BRAPI_DELAY = 0.5

@@ -18,7 +18,8 @@ dashboard/data/
 http_cache.sqlite
 *.sqlite
 
-# Ferramentas locais
+# Ferramentas e configurações pessoais (Claude Code, spec-kit)
 .claude/
 .spec-kit/
+CLAUDE.md
 
