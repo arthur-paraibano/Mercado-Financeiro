@@ -23,23 +23,26 @@ TICKERS_DEFAULT = [
     "TOTS3", "SLCE3", "FLRY3", "ENGI11", "CCRO3",
 ]
 
-# --- Configuracao ---
-usar_padrao = st.sidebar.checkbox("Usar lista padrao (25 ações)", value=True)
-if usar_padrao:
-    tickers = TICKERS_DEFAULT
-else:
-    tickers = ticker_multiselect(
-        "Selecione ações:",
-        default=TICKERS_DEFAULT[:10],
-        key="sinais_custom",
-        sidebar=True,
-    )
-
-filtro_sinal = st.sidebar.multiselect(
-    "Filtrar por sinal:",
-    ["COMPRA", "VENDA", "NEUTRO", "ATENCAO"],
-    default=["COMPRA", "VENDA"],
-)
+# --- Configurações ---
+with st.expander("⚙️ Configurações", expanded=True):
+    col1, col2 = st.columns([3, 2])
+    with col1:
+        usar_padrao = st.checkbox("Usar lista padrão (25 ações)", value=True)
+        if usar_padrao:
+            tickers = TICKERS_DEFAULT
+        else:
+            tickers = ticker_multiselect(
+                "Selecione ações:",
+                default=TICKERS_DEFAULT[:10],
+                key="sinais_custom",
+                sidebar=False,
+            )
+    with col2:
+        filtro_sinal = st.multiselect(
+            "Filtrar por sinal:",
+            ["COMPRA", "VENDA", "NEUTRO", "ATENCAO"],
+            default=["COMPRA", "VENDA"],
+        )
 
 ICONES = {"COMPRA": "🟢", "VENDA": "🔴", "NEUTRO": "⚪", "ATENCAO": "⚠️"}
 

@@ -24,34 +24,38 @@ TICKERS_PADRAO = [
     "BBDC4", "SANB11", "PRIO3", "VIVT3", "ABEV3",
 ]
 
-st.sidebar.subheader("Configuração")
-usar_padrao = st.sidebar.checkbox("Usar lista padrao (20 ações)", value=True)
+with st.expander("⚙️ Configurações", expanded=True):
+    col_uni, col_pesos = st.columns([3, 4])
 
-if usar_padrao:
-    tickers = TICKERS_PADRAO
-else:
-    tickers = ticker_multiselect(
-        "Selecione ações:",
-        default=["WEGE3", "ITUB4", "VALE3"],
-        key="ranking_custom",
-        sidebar=True,
-    )
+    with col_uni:
+        st.markdown("**Universo**")
+        usar_padrao = st.checkbox("Usar lista padrão (20 ações)", value=True)
+        if usar_padrao:
+            tickers = TICKERS_PADRAO
+        else:
+            tickers = ticker_multiselect(
+                "Selecione ações:",
+                default=["WEGE3", "ITUB4", "VALE3"],
+                key="ranking_custom",
+                sidebar=False,
+            )
 
-# Pesos customizaveis
-st.sidebar.subheader("Pesos do Score")
-p_saude = st.sidebar.slider("Saúde Financeira", 0, 50, 30)
-p_val = st.sidebar.slider("Valuation", 0, 50, 25)
-p_div = st.sidebar.slider("Dividendos", 0, 50, 20)
-p_cres = st.sidebar.slider("Crescimento", 0, 50, 15)
-p_tec = st.sidebar.slider("Técnico", 0, 50, 10)
+    with col_pesos:
+        st.markdown("**Pesos do Score**")
+        c1, c2, c3, c4, c5 = st.columns(5)
+        p_saude = c1.slider("Saúde", 0, 50, 30, key="rk_saude")
+        p_val = c2.slider("Valuation", 0, 50, 25, key="rk_val")
+        p_div = c3.slider("Dividendos", 0, 50, 20, key="rk_div")
+        p_cres = c4.slider("Crescimento", 0, 50, 15, key="rk_cres")
+        p_tec = c5.slider("Técnico", 0, 50, 10, key="rk_tec")
 
 if st.button("Calcular Ranking", type="primary"):
     fund = FundamentusCollector()
     brapi = BrapiCollector()
     calc = ScoreCalculator()
     calc.PESOS = {
-        "saúde": p_saude, "valuation": p_val,
-        "dividendos": p_div, "crescimento": p_cres, "técnico": p_tec,
+        "saude": p_saude, "valuation": p_val,
+        "dividendos": p_div, "crescimento": p_cres, "tecnico": p_tec,
     }
 
     resultados = []

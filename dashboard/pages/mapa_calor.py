@@ -15,12 +15,14 @@ from src.collectors.b3_collector import SETORES_B3  # noqa: E402
 st.title("🌡️ Mapa de Calor do Mercado")
 st.caption("Variação percentual do dia por setor. Verde = alta, Vermelho = queda.")
 
-# --- Sidebar ---
-st.sidebar.header("Filtros")
-setores_opcoes = ["Todos"] + sorted(SETORES_B3.keys())
-setor_filtro = st.sidebar.selectbox("Setor:", setores_opcoes)
-
-escala = st.sidebar.slider("Escala de cor (% max)", 1, 10, 5)
+# --- Configurações ---
+with st.expander("⚙️ Configurações", expanded=True):
+    col1, col2 = st.columns(2)
+    with col1:
+        setores_opcoes = ["Todos"] + sorted(SETORES_B3.keys())
+        setor_filtro = st.selectbox("Setor:", setores_opcoes)
+    with col2:
+        escala = st.slider("Escala de cor (% max)", 1, 10, 5)
 
 if st.button("Atualizar Mapa", type="primary"):
     brapi = BrapiCollector()

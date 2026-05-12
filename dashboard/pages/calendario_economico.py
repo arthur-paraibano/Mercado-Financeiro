@@ -86,22 +86,23 @@ EVENTOS = [
 ]
 
 # ========================================
-# Sidebar — filtros
+# Configurações
 # ========================================
-st.sidebar.header("Filtros")
+with st.expander("⚙️ Configurações", expanded=True):
+    col1, col2 = st.columns(2)
+    with col1:
+        paises_disponiveis = {"Todos": None, "Brasil 🇧🇷": "BR", "EUA 🇺🇸": "US", "Zona Euro 🇪🇺": "EU", "China 🇨🇳": "CN"}
+        pais_sel = st.selectbox("País:", list(paises_disponiveis.keys()))
 
-paises_disponiveis = {"Todos": None, "Brasil 🇧🇷": "BR", "EUA 🇺🇸": "US", "Zona Euro 🇪🇺": "EU", "China 🇨🇳": "CN"}
-pais_sel = st.sidebar.selectbox("País:", list(paises_disponiveis.keys()))
+        categorias_disp = sorted(set(e["categoria"] for e in EVENTOS))
+        categorias_sel = st.multiselect("Categorias:", categorias_disp, default=categorias_disp)
 
-categorias_disp = sorted(set(e["categoria"] for e in EVENTOS))
-categorias_sel = st.sidebar.multiselect("Categorias:", categorias_disp, default=categorias_disp)
+        impacto_sel = st.multiselect("Impacto:", ["alto", "medio", "baixo"], default=["alto", "medio"])
 
-impacto_sel = st.sidebar.multiselect("Impacto:", ["alto", "medio", "baixo"], default=["alto", "medio"])
-
-meses_frente = st.sidebar.slider("Próximos (meses):", 1, 12, 3)
-
-mostrar_passados = st.sidebar.checkbox("Incluir eventos passados", value=True)
-meses_passados_cal = st.sidebar.slider("Histórico (meses):", 1, 6, 1, disabled=not mostrar_passados)
+    with col2:
+        meses_frente = st.slider("Próximos (meses):", 1, 12, 3)
+        mostrar_passados = st.checkbox("Incluir eventos passados", value=True)
+        meses_passados_cal = st.slider("Histórico (meses):", 1, 6, 1, disabled=not mostrar_passados)
 
 # ========================================
 # Processar dados

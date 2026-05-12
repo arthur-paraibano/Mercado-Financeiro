@@ -15,21 +15,29 @@ from dashboard.components.ticker_selector import ticker_selectbox  # noqa: E402
 
 st.title("📈 Análise Técnica")
 
-# --- Sidebar ---
-ticker = ticker_selectbox("Selecione a ação:", default="PETR4", key="tec_analise_ticker", sidebar=True)
-periodo = st.sidebar.selectbox("Período:", ["1mo", "3mo"], index=1)
+# --- Configurações ---
+with st.expander("⚙️ Configurações", expanded=True):
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        ticker = ticker_selectbox("Selecione a ação:", default="PETR4", key="tec_analise_ticker", sidebar=False)
+    with col2:
+        periodo = st.selectbox("Período:", ["1mo", "3mo"], index=1)
 
-st.sidebar.subheader("Overlays")
-show_sma20 = st.sidebar.checkbox("SMA 20", value=True)
-show_sma50 = st.sidebar.checkbox("SMA 50", value=True)
-show_ema9 = st.sidebar.checkbox("EMA 9", value=False)
-show_ema21 = st.sidebar.checkbox("EMA 21", value=False)
-show_bollinger = st.sidebar.checkbox("Bollinger Bands", value=True)
+    col_ov, col_sg = st.columns(2)
+    with col_ov:
+        st.markdown("**Overlays (sobre o preço)**")
+        c1, c2 = st.columns(2)
+        show_sma20 = c1.checkbox("SMA 20", value=True)
+        show_sma50 = c2.checkbox("SMA 50", value=True)
+        show_ema9 = c1.checkbox("EMA 9", value=False)
+        show_ema21 = c2.checkbox("EMA 21", value=False)
+        show_bollinger = st.checkbox("Bollinger Bands", value=True)
 
-st.sidebar.subheader("Sub-gráficos")
-show_rsi = st.sidebar.checkbox("RSI (14)", value=True)
-show_macd = st.sidebar.checkbox("MACD", value=True)
-show_volume = st.sidebar.checkbox("Volume", value=True)
+    with col_sg:
+        st.markdown("**Sub-gráficos**")
+        show_rsi = st.checkbox("RSI (14)", value=True)
+        show_macd = st.checkbox("MACD", value=True)
+        show_volume = st.checkbox("Volume", value=True)
 
 if st.button("Analisar", type="primary") or ticker:
     brapi = BrapiCollector()

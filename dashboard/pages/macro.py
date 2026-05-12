@@ -83,8 +83,9 @@ with st.spinner("Carregando dados do IBGE..."):
     comercio = carregar_comercio()
 
 # BCB (tentativa rapida, sem travar a pagina)
-st.sidebar.subheader("Fontes BCB")
-tentar_bcb = st.sidebar.checkbox("Tentar carregar BCB (pode demorar)", value=False)
+with st.expander("⚙️ Configurações"):
+    tentar_bcb = st.checkbox("Tentar carregar dados do BCB (pode demorar)", value=False,
+                              help="Inclui Selic, câmbio e expectativas Focus. Pode levar até 15s.")
 
 selic_df = None
 cambio_df = None

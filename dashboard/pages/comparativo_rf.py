@@ -17,29 +17,30 @@ from dashboard.components.ticker_selector import ticker_selectbox  # noqa: E402
 st.title("⚖️ Ações vs Renda Fixa")
 st.caption("Simule R$ 10.000 investidos e compare o desempenho de uma ação com benchmarks de renda fixa.")
 
-# --- Configuracao ---
-col1, col2, col3 = st.columns(3)
-with col1:
-    ticker = ticker_selectbox("Ação para comparar:", default="PETR4", key="rf_ticker")
-with col2:
-    periodo_opcoes = {
-        "6 meses": ("6mo", 180),
-        "1 ano": ("1y", 365),
-        "2 anos": ("2y", 730),
-        "5 anos": ("5y", 1825),
-    }
-    periodo_sel = st.selectbox("Período:", list(periodo_opcoes.keys()), index=1)
-with col3:
-    valor_inicial = st.number_input("Valor inicial (R$):", min_value=100.0, value=10000.0, step=1000.0)
+# --- Configurações ---
+with st.expander("⚙️ Configurações", expanded=True):
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        ticker = ticker_selectbox("Ação para comparar:", default="PETR4", key="rf_ticker")
+    with col2:
+        periodo_opcoes = {
+            "6 meses": ("6mo", 180),
+            "1 ano": ("1y", 365),
+            "2 anos": ("2y", 730),
+            "5 anos": ("5y", 1825),
+        }
+        periodo_sel = st.selectbox("Período:", list(periodo_opcoes.keys()), index=1)
+    with col3:
+        valor_inicial = st.number_input("Valor inicial (R$):", min_value=100.0, value=10000.0, step=1000.0)
+
+    st.markdown("**Benchmarks a exibir**")
+    cb1, cb2, cb3, cb4 = st.columns(4)
+    exibir_cdi = cb1.checkbox("CDI", value=True)
+    exibir_ipca = cb2.checkbox("IPCA+", value=True)
+    exibir_ibov = cb3.checkbox("Ibovespa", value=True)
+    exibir_poup = cb4.checkbox("Poupança", value=True)
 
 periodo_brapi, dias = periodo_opcoes[periodo_sel]
-
-# Benchmarks a exibir
-st.sidebar.header("Benchmarks")
-exibir_cdi = st.sidebar.checkbox("CDI", value=True)
-exibir_ipca = st.sidebar.checkbox("IPCA+", value=True)
-exibir_ibov = st.sidebar.checkbox("Ibovespa", value=True)
-exibir_poup = st.sidebar.checkbox("Poupanca", value=True)
 
 CORES = {
     "Ação": "#1f77b4",

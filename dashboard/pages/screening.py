@@ -13,21 +13,25 @@ from src.collectors.fundamentus_collector import FundamentusCollector  # noqa: E
 
 st.title("Screening - Filtro Avancado de Ações")
 
-# --- Filtros na sidebar ---
-st.sidebar.header("Filtros Fundamentalistas")
+# --- Configurações ---
+with st.expander("⚙️ Configurações de Filtro", expanded=True):
+    st.markdown("**Filtros Fundamentalistas**")
+    c1, c2, c3, c4 = st.columns(4)
+    pl_min = c1.number_input("P/L mínimo", value=0.0, step=0.5)
+    pl_max = c2.number_input("P/L máximo", value=15.0, step=0.5)
+    pvp_max = c3.slider("P/VP máximo", 0.0, 10.0, 2.5, 0.1)
+    roe_min = c4.slider("ROE mínimo (%)", 0.0, 50.0, 10.0, 0.5)
 
-pl_min = st.sidebar.number_input("P/L mínimo", value=0.0, step=0.5)
-pl_max = st.sidebar.number_input("P/L máximo", value=15.0, step=0.5)
-pvp_max = st.sidebar.slider("P/VP máximo", 0.0, 10.0, 2.5, 0.1)
-roe_min = st.sidebar.slider("ROE mínimo (%)", 0.0, 50.0, 10.0, 0.5)
-dy_min = st.sidebar.slider("DY mínimo (%)", 0.0, 20.0, 0.0, 0.5)
-margem_min = st.sidebar.slider("Margem Líquida min (%)", -20.0, 40.0, 0.0, 0.5)
-ev_ebitda_max = st.sidebar.slider("EV/EBITDA máximo", 0.0, 30.0, 12.0, 0.5)
-liq_corrente_min = st.sidebar.slider("Liquidez Corrente min", 0.0, 5.0, 0.0, 0.1)
+    c5, c6, c7, c8 = st.columns(4)
+    dy_min = c5.slider("DY mínimo (%)", 0.0, 20.0, 0.0, 0.5)
+    margem_min = c6.slider("Margem Líq. min (%)", -20.0, 40.0, 0.0, 0.5)
+    ev_ebitda_max = c7.slider("EV/EBITDA máximo", 0.0, 30.0, 12.0, 0.5)
+    liq_corrente_min = c8.slider("Liquidez Corrente min", 0.0, 5.0, 0.0, 0.1)
 
-st.sidebar.header("Filtros Adicionais")
-excluir_prejuizo = st.sidebar.checkbox("Excluir empresas com prejuizo", value=True)
-apenas_lucro_crescente = st.sidebar.checkbox("Apenas com crescimento receita 5a > 0", value=False)
+    st.markdown("**Filtros Adicionais**")
+    c9, c10 = st.columns(2)
+    excluir_prejuizo = c9.checkbox("Excluir empresas com prejuízo", value=True)
+    apenas_lucro_crescente = c10.checkbox("Apenas com crescimento receita 5a > 0", value=False)
 
 # Universo de acoes
 TICKERS = [

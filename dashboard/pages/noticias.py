@@ -102,37 +102,51 @@ def buscar_noticias_cache(feeds_tuple: tuple) -> list[dict]:
     return noticias
 
 
-# --- Sidebar ---
-st.sidebar.header("Filtros")
+# --- Configurações ---
+with st.expander("⚙️ Configurações", expanded=True):
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("**Fontes**")
+        fontes_sel = st.multiselect(
+            "Selecione as fontes:",
+            list(FEEDS.keys()),
+            default=list(FEEDS.keys()),
+            label_visibility="collapsed",
+        )
+        st.markdown("**Filtro por tema**")
+        modo_filtro = st.radio(
+            "Filtrar por:",
+            ["Todos", "Setor", "Palavra-chave"],
+            horizontal=True,
+            label_visibility="collapsed",
+        )
+        busca_personalizada = ""
+        setor_sel = None
+        if modo_filtro == "Setor":
+            setor_sel = st.selectbox("Setor:", list(KEYWORDS_SETOR.keys()))
+        elif modo_filtro == "Palavra-chave":
+            busca_personalizada = st.text_input(
+                "Buscar:", placeholder="Ex: Petrobras, selic, dividendos"
+            )
 
-# Selecionar fontes
-fontes_sel = st.sidebar.multiselect(
-    "Fontes:",
-    list(FEEDS.keys()),
-    default=list(FEEDS.keys()),
-)
+    with col2:
+        st.markdown("**Período**")
+        periodo_h = st.selectbox(
+            "Publicado nas últimas:",
+            ["24 horas", "48 horas", "7 dias", "Todos"],
+            index=2,
+            label_visibility="collapsed",
+        )
+        st.markdown("**Sentimento**")
+        sentimento_filtro = st.multiselect(
+            "Sentimento:",
+            ["positivo", "negativo", "neutro"],
+            default=["positivo", "negativo", "neutro"],
+            label_visibility="collapsed",
+        )
 
-# Filtro por tema
-modo_filtro = st.sidebar.radio("Filtrar por:", ["Todos", "Setor", "Palavra-chave"])
-
-busca_personalizada = ""
-setor_sel = None
-if modo_filtro == "Setor":
-    setor_sel = st.sidebar.selectbox("Setor:", list(KEYWORDS_SETOR.keys()))
-elif modo_filtro == "Palavra-chave":
-    busca_personalizada = st.sidebar.text_input("Buscar:", placeholder="Ex: Petrobras, selic, dividendos")
-
-# Filtro de tempo
-periodo_h = st.sidebar.selectbox("Publicado nas últimas:", ["24 horas", "48 horas", "7 dias", "Todos"], index=2)
 horas_map = {"24 horas": 24, "48 horas": 48, "7 dias": 168, "Todos": 99999}
 horas_max = horas_map[periodo_h]
-
-# Sentimento
-sentimento_filtro = st.sidebar.multiselect(
-    "Sentimento:",
-    ["positivo", "negativo", "neutro"],
-    default=["positivo", "negativo", "neutro"],
-)
 
 # --- Carregar noticias ---
 with st.spinner("Carregando notícias..."):
